@@ -1,3 +1,4 @@
-// @atlas/ui — Placeholder for shared UI components (shadcn/ui primitives, design system).
+// @atlas/ui — Shared UI components (design system primitives).
 
 export { Button } from "./button.js";
+export type { ButtonProps } from "./button.js";
