@@ -116,7 +116,11 @@ importers:
 
   packages/scene-engine: {}
 
-  packages/shared: {}
+  packages/shared:
+    devDependencies:
+      vitest:
+        specifier: ^2.1.8
+        version: 2.1.9(@types/node@22.20.0)(lightningcss@1.32.0)
 
   packages/ui:
     dependencies:
