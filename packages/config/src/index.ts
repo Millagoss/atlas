@@ -8,8 +8,9 @@ export interface AtlasPlatformConfig {
 }
 
 export function loadConfig(): AtlasPlatformConfig {
+  const env = process.env["NODE_ENV"];
   return {
     webUrl: process.env["WEB_URL"] ?? "http://localhost:3000",
-    env: (process.env["NODE_ENV"] as AtlasPlatformConfig["env"]) ?? "development",
+    env: env === "staging" || env === "production" ? env : "development",
   };
 }

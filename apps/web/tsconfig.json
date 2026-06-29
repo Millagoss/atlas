@@ -5,8 +5,18 @@
     "rootDir": ".",
     "jsx": "react-jsx",
     "composite": false,
-    "baseUrl": "."
+    "baseUrl": ".",
+    "paths": {
+      "@atlas/shared": ["../../packages/shared/src/index.ts"],
+      "@atlas/config": ["../../packages/config/src/index.ts"],
+      "@atlas/ui": ["../../packages/ui/src/index.ts"]
+    }
   },
   "include": ["app/**/*.ts", "app/**/*.tsx", "*.ts"],
-  "exclude": ["node_modules", "dist", ".vinxi", ".output"]
+  "exclude": ["node_modules", "dist", ".vinxi", ".output"],
+  "references": [
+    { "path": "../../packages/shared" },
+    { "path": "../../packages/config" },
+    { "path": "../../packages/ui" }
+  ]
 }
