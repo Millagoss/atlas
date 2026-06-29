@@ -58,11 +58,7 @@ const SandboxContext = createContext<{
 
 export function SandboxProvider({ children }: { children: ReactNode }) {
   const [state, dispatch] = useReducer(sandboxReducer, initialState);
-  return (
-    <SandboxContext.Provider value={{ state, dispatch }}>
-      {children}
-    </SandboxContext.Provider>
-  );
+  return <SandboxContext.Provider value={{ state, dispatch }}>{children}</SandboxContext.Provider>;
 }
 
 export function useSandbox() {

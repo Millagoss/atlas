@@ -26,6 +26,7 @@
     { "path": "packages/viewer-engine" },
     { "path": "packages/shared" },
     { "path": "packages/ui" },
-    { "path": "packages/config" }
+    { "path": "packages/config" },
+    { "path": "packages/pipeline" }
   ]
 }

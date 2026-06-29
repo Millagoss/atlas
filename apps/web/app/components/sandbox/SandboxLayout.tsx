@@ -17,9 +17,7 @@ export function SandboxLayout() {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-bold tracking-tight">Developer Sandbox</h1>
-            <p className="text-sm text-muted-foreground">
-              Atlas Spatial Pipeline Inspector
-            </p>
+            <p className="text-sm text-muted-foreground">Atlas Spatial Pipeline Inspector</p>
           </div>
           <DevToolbar />
         </div>
