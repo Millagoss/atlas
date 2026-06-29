@@ -9,9 +9,7 @@ export interface AtlasMetadata {
   updatedAt: string;
 }
 
-export type AtlasResult<T> =
-  | { ok: true; data: T }
-  | { ok: false; error: AtlasError };
+export type AtlasResult<T> = { ok: true; data: T } | { ok: false; error: AtlasError };
 
 export interface AtlasError {
   code: string;

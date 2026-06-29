@@ -1,14 +1,18 @@
 # @atlas/scene-engine
 
-**Purpose**: 3D scene graph management, transforms, and spatial queries.
+3D scene graph management, transforms, and spatial queries.
 
-**Responsibilities**:
+## Responsibilities
+
 - Scene graph construction and traversal
 - Node transform management
 - Spatial indexing
 
-**Public API**:
+## Public API
 
-```ts
-import { createSceneGraph, SceneNode } from "@atlas/scene-engine";
-```
+- `createSceneGraph`
+- `SceneNode`
+
+## Dependencies
+
+- None

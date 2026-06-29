@@ -28,15 +28,15 @@ Repository Structure
 Create the following structure:
 
 apps/
-    web/
+web/
 
 packages/
-    ai-engine/
-    scene-engine/
-    viewer-engine/
-    shared/
-    ui/
-    config/
+ai-engine/
+scene-engine/
+viewer-engine/
+shared/
+ui/
+config/
 
 workers/
 

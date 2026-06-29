@@ -1,15 +1,21 @@
 # @atlas/ui
 
-**Purpose**: Shared UI component library and design system primitives.
+Shared UI component library and design system primitives.
 
-**Responsibilities**:
+## Responsibilities
+
 - Reusable React components
 - Design system tokens and primitives
-- Consistent styling across the platform
+- Consistent styling via Tailwind CSS
 
-**Public API**:
+## Public API
 
-```ts
-import { Button } from "@atlas/ui";
-import type { ButtonProps } from "@atlas/ui";
-```
+- `Button`
+- `ButtonProps`
+
+## Dependencies
+
+- `react` (peer)
+- `react-dom` (peer)
+- `@types/react` (dev)
+- `@types/react-dom` (dev)

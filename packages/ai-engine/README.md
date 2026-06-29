@@ -1,14 +1,18 @@
 # @atlas/ai-engine
 
-**Purpose**: AI inference, model management, and pipeline orchestration.
+AI inference, model management, and pipeline orchestration.
 
-**Responsibilities**:
+## Responsibilities
+
 - AI model lifecycle management
 - Inference pipeline execution
 - Model configuration
 
-**Public API**:
+## Public API
 
-```ts
-import { createAiEngine, AiEngineConfig } from "@atlas/ai-engine";
-```
+- `createAiEngine`
+- `AiEngineConfig`
+
+## Dependencies
+
+- None

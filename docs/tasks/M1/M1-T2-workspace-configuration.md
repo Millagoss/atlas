@@ -39,47 +39,57 @@ Configure the Atlas workspace so every package behaves like a first-class worksp
 ## Summary
 
 ### TypeScript Configuration
+
 - Root `tsconfig.json`: strict mode, composite, incremental, ESNext modules — confirmed correct.
 - `apps/web/tsconfig.json`: Added `paths` for `@atlas/shared`, `@atlas/config`, `@atlas/ui` and project `references` for dependent packages.
 - Package tsconfigs all extend root with self-referencing paths.
 
 ### Package Exports
+
 - Removed subpath exports (`./utils`, `./types`) from `@atlas/shared` — all consumers now import from `@atlas/shared` only.
 - Every package exposes a single public API via `src/index.ts`.
 
 ### Build Configuration
+
 - `turbo.json` build task depends on `^build` (upstream), ensuring correct build order.
 - Dev task has `cache: false` + `persistent: true` (prevents unnecessary rebuilds).
 - All 7 packages build and typecheck successfully with Turborepo caching.
 
 ### Environment Management
+
 - Created `.env.example` with `VITE_APP_NAME`, `NODE_ENV`, `WEB_URL` placeholders.
 
 ### Repository Standards
+
 - Created `.editorconfig`: UTF-8, LF, 2-space indent, final newline, trimmed trailing whitespace (except Markdown).
 - Created `LICENSE` (MIT).
 
 ### Dependency Review
+
 - Aligned `vitest` version in `apps/web` to `^2.1.8` (matched root).
 - Added `"type": "module"` to root `package.json` to suppress ESLint module warnings.
 - Fixed lint error in `packages/config/src/index.ts` (unnecessary `??` after type assertion).
 
 ### Bug Fix
+
 - Fixed CSS import path in `apps/web/app/routes/__root.tsx`: `../app/globals.css` → `../globals.css`.
 
 ### Verification
+
 - `pnpm run typecheck` — 7/7 pass
 - `pnpm run build` — 7/7 pass
 - `pnpm run lint` — 7/7 pass
 - `pnpm run test` — 3/3 tests pass (cross-package imports verified)
 
 ### Files Created
+
 - `docs/tasks/M1/M1-T2-workspace-configuration.md`
 - `.env.example`
 - `.editorconfig`
 - `LICENSE`
 
 ### Files Modified
+
 - `packages/shared/package.json` — removed subpath exports
 - `packages/shared/tsconfig.json` — simplified paths
 - `apps/web/tsconfig.json` — added paths and project references
@@ -89,11 +99,13 @@ Configure the Atlas workspace so every package behaves like a first-class worksp
 - `packages/config/src/index.ts` — fixed lint error
 
 ### Architectural Decisions
+
 - Path aliases configured in `apps/web/tsconfig.json` point directly to package source (not dist), enabling type resolution without requiring a full build first.
 - `@atlas/shared` subpath exports removed to enforce single public API principle.
 - `"type": "module"` added to root despite it being `"private": true` to suppress Node.js warnings from ESLint config resolution.
 
 ### Future Considerations
+
 - `tooling/` and `workers/` directories are empty scaffolding — populate when those concerns are needed.
 - Consider adding `tsconfig` path aliases to `apps/web/vitest.config.ts` if tests need to resolve `@atlas/*` without the pnpm workspace symlink.
 - `@atlas/config` uses `process.env` directly — consider a formal env validation layer in a future task.

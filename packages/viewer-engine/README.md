@@ -1,14 +1,18 @@
 # @atlas/viewer-engine
 
-**Purpose**: 3D model rendering, camera controls, and viewport management.
+3D model rendering, camera controls, and viewport management.
 
-**Responsibilities**:
+## Responsibilities
+
 - WebGL canvas initialization
 - Camera rig and controls
 - Viewport rendering pipeline
 
-**Public API**:
+## Public API
 
-```ts
-import { createViewer, ViewerConfig } from "@atlas/viewer-engine";
-```
+- `createViewer`
+- `ViewerConfig`
+
+## Dependencies
+
+- None

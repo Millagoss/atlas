@@ -1,14 +1,18 @@
 # @atlas/config
 
-**Purpose**: Platform-wide configuration constants and environment validation.
+Platform-wide configuration constants and environment validation.
 
-**Responsibilities**:
+## Responsibilities
+
 - Environment detection (development, staging, production)
 - Platform URL resolution
-- Centralized config access via `loadConfig()`
+- Centralized config via `loadConfig()`
 
-**Public API**:
+## Public API
 
-```ts
-import { loadConfig, AtlasPlatformConfig } from "@atlas/config";
-```
+- `loadConfig`
+- `AtlasPlatformConfig`
+
+## Dependencies
+
+- `@types/node` (dev, for `process.env` types)
