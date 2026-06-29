@@ -1,0 +1,14 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "paths": {
+      "@atlas/shared": ["./src/index.ts"],
+      "@atlas/shared/utils": ["./src/utils/index.ts"],
+      "@atlas/shared/types": ["./src/types/index.ts"]
+    }
+  },
+  "include": ["src"],
+  "references": []
+}

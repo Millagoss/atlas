@@ -1,0 +1,12 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "paths": {
+      "@atlas/config": ["./src/index.ts"]
+    }
+  },
+  "include": ["src"],
+  "references": []
+}
