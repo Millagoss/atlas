@@ -10,11 +10,21 @@
 // the injectable {@link ImageMetadataExtractor}, so the orchestrator can be
 // fully unit-tested with a fake extractor and no DOM.
 
-import { createImageAsset, type AtlasResult, type ImageAsset } from "@atlas/shared";
+import {
+  createImageAsset,
+  type AtlasResult,
+  type DepthAsset,
+  type ImageAsset,
+  type SpatialScene,
+} from "@atlas/shared";
 import { createPipelineContext, type Pipeline } from "@atlas/pipeline";
 import type { AssetRegistry } from "@atlas/shared";
 
-import { IMAGE_ASSET_CONTEXT_KEY } from "./constants.js";
+import {
+  DEPTH_ASSET_CONTEXT_KEY,
+  IMAGE_ASSET_CONTEXT_KEY,
+  SPATIAL_SCENE_CONTEXT_KEY,
+} from "./constants.js";
 import type { ImageMetadataExtractor } from "./extract.js";
 import type { ImageFileInput } from "./validate.js";
 import { validateImageFile } from "./validate.js";
@@ -35,10 +45,12 @@ export interface IngestionDeps {
   readonly logger: IngestionLogger;
 }
 
-/** Successful ingestion result: the immutable asset plus a preview URL. */
+/** Successful ingestion result: the immutable assets produced by the pipeline. */
 export interface IngestionSuccess {
   readonly asset: ImageAsset;
   readonly previewUrl: string;
+  readonly depth: DepthAsset;
+  readonly scene: SpatialScene;
 }
 
 export type IngestionOutcome = AtlasResult<IngestionSuccess>;
@@ -101,6 +113,16 @@ export async function ingestImage(file: File, deps: IngestionDeps): Promise<Inge
     return { ok: false, error: { code: "PIPELINE_FAILED", message } };
   }
 
+  const depth = context.get<DepthAsset>(DEPTH_ASSET_CONTEXT_KEY);
+  const scene = context.get<SpatialScene>(SPATIAL_SCENE_CONTEXT_KEY);
+
+  if (!depth || !scene) {
+    const message = "Pipeline completed but did not produce a depth or scene asset";
+    logger.log("error", `Pipeline Incomplete: ${message}`);
+    return { ok: false, error: { code: "PIPELINE_INCOMPLETE", message } };
+  }
+
   logger.log("info", `Pipeline Completed (${String(result.completedStages.length)} stages)`);
-  return { ok: true, data: { asset, previewUrl } };
+  logger.log("info", `SpatialScene Created: ${scene.id}`);
+  return { ok: true, data: { asset, previewUrl, depth, scene } };
 }

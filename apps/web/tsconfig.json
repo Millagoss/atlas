@@ -10,7 +10,9 @@
       "@atlas/shared": ["../../packages/shared/src/index.ts"],
       "@atlas/config": ["../../packages/config/src/index.ts"],
       "@atlas/ui": ["../../packages/ui/src/index.ts"],
-      "@atlas/pipeline": ["../../packages/pipeline/src/index.ts"]
+      "@atlas/pipeline": ["../../packages/pipeline/src/index.ts"],
+      "@atlas/ai-engine": ["../../packages/ai-engine/src/index.ts"],
+      "@atlas/scene-engine": ["../../packages/scene-engine/src/index.ts"]
     }
   },
   "include": ["app/**/*.ts", "app/**/*.tsx", "*.ts"],
@@ -19,6 +21,8 @@
     { "path": "../../packages/shared" },
     { "path": "../../packages/config" },
     { "path": "../../packages/ui" },
-    { "path": "../../packages/pipeline" }
+    { "path": "../../packages/pipeline" },
+    { "path": "../../packages/ai-engine" },
+    { "path": "../../packages/scene-engine" }
   ]
 }

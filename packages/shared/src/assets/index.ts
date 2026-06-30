@@ -9,12 +9,20 @@ export type {
   ImageAsset,
   ProcessedImageAsset,
   DepthAsset,
+  SpatialScene,
+  SpatialSceneNode,
+  SpatialSceneInitOptions,
   AnyAsset,
   AssetInitOptions,
   DimensionedAssetInitOptions,
 } from "./types.js";
 
-export { createImageAsset, createProcessedImageAsset, createDepthAsset } from "./factories.js";
+export {
+  createImageAsset,
+  createProcessedImageAsset,
+  createDepthAsset,
+  createSpatialScene,
+} from "./factories.js";
 
 export { validateAsset } from "./validation.js";
 

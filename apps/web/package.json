@@ -12,8 +12,10 @@
     "test": "vitest run"
   },
   "dependencies": {
+    "@atlas/ai-engine": "workspace:*",
     "@atlas/config": "workspace:*",
     "@atlas/pipeline": "workspace:*",
+    "@atlas/scene-engine": "workspace:*",
     "@atlas/shared": "workspace:*",
     "@atlas/ui": "workspace:*",
     "@tanstack/react-router": "^1.95.0",

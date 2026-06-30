@@ -89,9 +89,12 @@ export function useIngestion() {
       const result = await ingestImage(file, { registry, pipeline, extractor, logger });
 
       if (result.ok) {
-        dispatch({ type: "SET_ORIGINAL_IMAGE", payload: result.data.previewUrl });
-        dispatch({ type: "SET_CURRENT_ASSET", payload: result.data.asset });
-        dispatch({ type: "SET_ASSET_ID", payload: result.data.asset.id });
+        const { asset, previewUrl, depth, scene } = result.data;
+        dispatch({ type: "SET_ORIGINAL_IMAGE", payload: previewUrl });
+        dispatch({ type: "SET_CURRENT_ASSET", payload: asset });
+        dispatch({ type: "SET_ASSET_ID", payload: asset.id });
+        dispatch({ type: "SET_DEPTH_ASSET", payload: depth });
+        dispatch({ type: "SET_SPATIAL_SCENE", payload: scene });
         dispatch({ type: "SET_REGISTRY_COUNT", payload: registry.size() });
       } else {
         dispatch({ type: "SET_INGESTION_ERROR", payload: result.error.message });

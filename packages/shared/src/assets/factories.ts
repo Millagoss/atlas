@@ -15,6 +15,9 @@ import type {
   DimensionedAssetInitOptions,
   ImageAsset,
   ProcessedImageAsset,
+  SpatialScene,
+  SpatialSceneInitOptions,
+  SpatialSceneNode,
 } from "./types.js";
 
 /** Timestamp helper kept central so tests can override behavior predictably. */
@@ -30,7 +33,11 @@ function nowIso(): string {
  * without pulling in a deep-freeze library.
  */
 function freezeAsset<T extends object>(asset: T): Readonly<T> {
-  const obj = asset as unknown as { metadata?: AssetMetadata; dimensions?: Dimensions };
+  const obj = asset as unknown as {
+    metadata?: AssetMetadata;
+    dimensions?: Dimensions;
+    root?: SpatialSceneNode;
+  };
   const meta = obj.metadata;
   if (meta && typeof meta === "object") {
     Object.freeze(meta);
@@ -38,6 +45,10 @@ function freezeAsset<T extends object>(asset: T): Readonly<T> {
   const dims = obj.dimensions;
   if (dims && typeof dims === "object") {
     Object.freeze(dims);
+  }
+  const root = obj.root;
+  if (root && typeof root === "object") {
+    freezeSceneNode(root);
   }
   return Object.freeze(asset);
 }
@@ -113,5 +124,33 @@ export function createDepthAsset(options: DimensionedAssetInitOptions): DepthAss
     ...base,
     type: "depth",
     dimensions: options.dimensions,
+  });
+}
+
+/**
+ * Deep-freeze a scene-graph node and all its descendants, enforcing the
+ * immutability contract of {@link SpatialScene} without a deep-freeze library.
+ */
+function freezeSceneNode(node: SpatialSceneNode): void {
+  for (const child of node.children) {
+    freezeSceneNode(child);
+  }
+  Object.freeze(node);
+}
+
+/**
+ * Create an immutable {@link SpatialScene}, the canonical scene representation
+ * produced by a scene builder.
+ *
+ * Lineage (source asset ids), processing time, and node counts should be
+ * injected via `metadata`; the factory itself only owns the structural fields.
+ */
+export function createSpatialScene(options: SpatialSceneInitOptions): SpatialScene {
+  const base = buildBaseFields(options);
+  return freezeAsset<SpatialScene>({
+    ...base,
+    type: "spatial-scene",
+    dimensions: options.dimensions,
+    root: options.root,
   });
 }

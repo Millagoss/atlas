@@ -44,12 +44,18 @@ importers:
 
   apps/web:
     dependencies:
+      '@atlas/ai-engine':
+        specifier: workspace:*
+        version: link:../../packages/ai-engine
       '@atlas/config':
         specifier: workspace:*
         version: link:../../packages/config
       '@atlas/pipeline':
         specifier: workspace:*
         version: link:../../packages/pipeline
+      '@atlas/scene-engine':
+        specifier: workspace:*
+        version: link:../../packages/scene-engine
       '@atlas/shared':
         specifier: workspace:*
         version: link:../../packages/shared
@@ -103,7 +109,15 @@ importers:
         specifier: ^2.1.8
         version: 2.1.9(@types/node@22.20.0)(lightningcss@1.32.0)
 
-  packages/ai-engine: {}
+  packages/ai-engine:
+    dependencies:
+      '@atlas/shared':
+        specifier: workspace:*
+        version: link:../shared
+    devDependencies:
+      vitest:
+        specifier: ^2.1.8
+        version: 2.1.9(@types/node@22.20.0)(lightningcss@1.32.0)
 
   packages/config:
     devDependencies:
@@ -117,7 +131,15 @@ importers:
         specifier: ^2.1.8
         version: 2.1.9(@types/node@22.20.0)(lightningcss@1.32.0)
 
-  packages/scene-engine: {}
+  packages/scene-engine:
+    dependencies:
+      '@atlas/shared':
+        specifier: workspace:*
+        version: link:../shared
+    devDependencies:
+      vitest:
+        specifier: ^2.1.8
+        version: 2.1.9(@types/node@22.20.0)(lightningcss@1.32.0)
 
   packages/shared:
     devDependencies:

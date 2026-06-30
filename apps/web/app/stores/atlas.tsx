@@ -1,34 +1,40 @@
 import { createContext, useContext, useMemo, type ReactNode } from "react";
 import { AssetRegistry } from "@atlas/shared";
 import type { Pipeline } from "@atlas/pipeline";
-import { createIngestionPipeline } from "../ingestion/stages";
-import { createBrowserImageExtractor, type ImageMetadataExtractor } from "../ingestion/extract";
+import type { DepthProvider } from "@atlas/ai-engine";
+import { createMockDepthProvider } from "@atlas/ai-engine";
+import type { SpatialSceneBuilder } from "@atlas/scene-engine";
+import { createSceneBuilder } from "@atlas/scene-engine";
+import {
+  createIngestionPipeline,
+  createBrowserImageExtractor,
+  type ImageMetadataExtractor,
+} from "../ingestion/index";
 
-/**
- * Runtime services used by the Sandbox: the in-memory Asset Registry, the
- * ingestion pipeline, and the image-metadata extractor.
- *
- * Instances are created once per Sandbox session (per `AtlasProvider` mount)
- * via `useMemo`, so the registry genuinely acts as the single source of truth
- * for that session and is naturally reset when the route unmounts.
- */
 export interface AtlasServices {
   readonly registry: AssetRegistry;
   readonly pipeline: Pipeline;
   readonly extractor: ImageMetadataExtractor;
+  readonly depthProvider: DepthProvider;
+  readonly sceneBuilder: SpatialSceneBuilder;
 }
 
 const AtlasServicesContext = createContext<AtlasServices | null>(null);
 
 export function AtlasServicesProvider({ children }: { children: ReactNode }) {
-  const services = useMemo<AtlasServices>(
-    () => ({
+  const services = useMemo<AtlasServices>(() => {
+    const depthProvider = createMockDepthProvider();
+    const sceneBuilder = createSceneBuilder();
+    const pipeline = createIngestionPipeline({ depthProvider, sceneBuilder });
+
+    return {
       registry: new AssetRegistry(),
-      pipeline: createIngestionPipeline(),
+      pipeline,
       extractor: createBrowserImageExtractor(),
-    }),
-    [],
-  );
+      depthProvider,
+      sceneBuilder,
+    };
+  }, []);
 
   return <AtlasServicesContext.Provider value={services}>{children}</AtlasServicesContext.Provider>;
 }

@@ -24,3 +24,9 @@ export const MAX_IMAGE_FILE_SIZE = 25 * 1024 * 1024;
  * {@link PipelineContext} so downstream stages can retrieve it.
  */
 export const IMAGE_ASSET_CONTEXT_KEY = "imageAsset";
+
+/** Key under which the {@link DepthAsset} produced by the depth stage is stored. */
+export const DEPTH_ASSET_CONTEXT_KEY = "depthAsset";
+
+/** Key under which the {@link SpatialScene} produced by the scene stage is stored. */
+export const SPATIAL_SCENE_CONTEXT_KEY = "spatialScene";

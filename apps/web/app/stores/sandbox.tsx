@@ -1,5 +1,5 @@
 import { createContext, useContext, useReducer, type Dispatch, type ReactNode } from "react";
-import type { AnyAsset } from "@atlas/shared";
+import type { AnyAsset, DepthAsset, SpatialScene } from "@atlas/shared";
 
 /** A single structured log entry displayed in the Sandbox Logs panel. */
 export interface LogEntry {
@@ -19,7 +19,10 @@ export interface SandboxState {
   originalImage: string | null;
   processedImage: string | null;
   depthMap: string | null;
-  spatialScene: unknown;
+  /** The DepthAsset produced by the generate-depth pipeline stage. */
+  depthAsset: DepthAsset | null;
+  /** The SpatialScene produced by the build-spatial-scene pipeline stage. */
+  spatialScene: SpatialScene | null;
   runtimeScene: unknown;
   /** Structured ingestion/pipeline lifecycle log entries, in order. */
   logs: LogEntry[];
@@ -43,7 +46,8 @@ export type SandboxAction =
   | { type: "SET_ORIGINAL_IMAGE"; payload: string | null }
   | { type: "SET_PROCESSED_IMAGE"; payload: string | null }
   | { type: "SET_DEPTH_MAP"; payload: string | null }
-  | { type: "SET_SPATIAL_SCENE"; payload: unknown }
+  | { type: "SET_DEPTH_ASSET"; payload: DepthAsset | null }
+  | { type: "SET_SPATIAL_SCENE"; payload: SpatialScene | null }
   | { type: "SET_RUNTIME_SCENE"; payload: unknown }
   | { type: "APPEND_LOG"; payload: LogEntry }
   | { type: "CLEAR_LOGS" }
@@ -60,6 +64,7 @@ export const initialState: SandboxState = {
   originalImage: null,
   processedImage: null,
   depthMap: null,
+  depthAsset: null,
   spatialScene: null,
   runtimeScene: null,
   logs: [],
@@ -80,6 +85,8 @@ export function sandboxReducer(state: SandboxState, action: SandboxAction): Sand
       return { ...state, processedImage: action.payload };
     case "SET_DEPTH_MAP":
       return { ...state, depthMap: action.payload };
+    case "SET_DEPTH_ASSET":
+      return { ...state, depthAsset: action.payload };
     case "SET_SPATIAL_SCENE":
       return { ...state, spatialScene: action.payload };
     case "SET_RUNTIME_SCENE":

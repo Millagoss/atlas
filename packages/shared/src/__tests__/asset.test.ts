@@ -3,16 +3,26 @@ import {
   createImageAsset,
   createProcessedImageAsset,
   createDepthAsset,
+  createSpatialScene,
   validateAsset,
   serializeAsset,
   deserializeAsset,
 } from "../index.js";
-import type { Asset, AtlasError, AtlasResult } from "../index.js";
+import type { Asset, AtlasError, AtlasResult, SpatialSceneNode } from "../index.js";
 
 const PNG = "image/png";
 const DIMENSIONS = { width: 640, height: 480 } as const;
 const FIXED_ID = "11111111-1111-4111-8111-111111111111";
 const FIXED_TIMESTAMP = "2025-06-29T12:00:00.000Z";
+
+const SIMPLE_SCENE_ROOT: SpatialSceneNode = {
+  id: "root-001",
+  name: "root",
+  children: [
+    { id: "img-plane", name: "image-plane", children: [] },
+    { id: "depth-field", name: "depth-field", children: [] },
+  ],
+};
 
 function expectError(result: AtlasResult<unknown>): AtlasError {
   expect(result.ok).toBe(false);
@@ -84,6 +94,43 @@ describe("Asset System", () => {
       expect(a.metadata).not.toBe(b.metadata);
       expect(a.metadata).toEqual(b.metadata);
     });
+
+    it("createSpatialScene produces a SpatialScene with scene graph", () => {
+      const scene = createSpatialScene({
+        mimeType: "application/json",
+        dimensions: DIMENSIONS,
+        root: SIMPLE_SCENE_ROOT,
+        metadata: { nodeCount: 3, sourceImageId: FIXED_ID, processingTimeMs: 12 },
+      });
+
+      expect(scene.type).toBe("spatial-scene");
+      expect(scene.dimensions).toEqual(DIMENSIONS);
+      expect(scene.root.id).toBe("root-001");
+      expect(scene.root.children).toHaveLength(2);
+      expect(scene.metadata["nodeCount"]).toBe(3);
+    });
+
+    it("createSpatialScene extends the transformation chain to scenes", () => {
+      const image = createImageAsset({ mimeType: PNG, dimensions: DIMENSIONS, id: FIXED_ID });
+      const depth = createDepthAsset({
+        mimeType: "application/octet-stream",
+        dimensions: DIMENSIONS,
+        metadata: { sourceAssetId: image.id },
+      });
+      const scene = createSpatialScene({
+        mimeType: "application/json",
+        dimensions: DIMENSIONS,
+        root: SIMPLE_SCENE_ROOT,
+        metadata: {
+          sourceImageId: image.id,
+          sourceDepthId: depth.id,
+          nodeCount: 3,
+        },
+      });
+
+      expect(scene.metadata["sourceImageId"] as string).toBe(image.id);
+      expect(scene.metadata["sourceDepthId"] as string).toBe(depth.id);
+    });
   });
 
   describe("immutability", () => {
@@ -132,6 +179,32 @@ describe("Asset System", () => {
         asset.dimensions.width = 9999;
       }).toThrow(TypeError);
     });
+
+    it("deeply freezes scene graph nodes", () => {
+      const scene = createSpatialScene({
+        mimeType: "application/json",
+        dimensions: DIMENSIONS,
+        root: SIMPLE_SCENE_ROOT,
+      });
+
+      expect(Object.isFrozen(scene)).toBe(true);
+      expect(Object.isFrozen(scene.root)).toBe(true);
+      expect(Object.isFrozen(scene.root.children[0] ?? {})).toBe(true);
+    });
+
+    it("rejects mutation of scene nodes in strict mode", () => {
+      "use strict";
+      const scene = createSpatialScene({
+        mimeType: "application/json",
+        dimensions: DIMENSIONS,
+        root: SIMPLE_SCENE_ROOT,
+      });
+
+      expect(() => {
+        // @ts-expect-error -- verifying runtime immutability
+        scene.root.name = "tampered";
+      }).toThrow(TypeError);
+    });
   });
 
   describe("validation", () => {
@@ -150,10 +223,16 @@ describe("Asset System", () => {
         mimeType: "application/octet-stream",
         dimensions: DIMENSIONS,
       });
+      const scene = createSpatialScene({
+        mimeType: "application/json",
+        dimensions: DIMENSIONS,
+        root: SIMPLE_SCENE_ROOT,
+      });
 
       expect(validateAsset(image).ok).toBe(true);
       expect(validateAsset(processed).ok).toBe(true);
       expect(validateAsset(depth).ok).toBe(true);
+      expect(validateAsset(scene).ok).toBe(true);
     });
 
     it("rejects a non-object input", () => {
@@ -177,7 +256,7 @@ describe("Asset System", () => {
     it("rejects an unknown asset type", () => {
       const result = validateAsset({
         id: FIXED_ID,
-        type: "spatial-scene",
+        type: "mesh",
         createdAt: FIXED_TIMESTAMP,
         mimeType: PNG,
         metadata: {},
@@ -262,6 +341,45 @@ describe("Asset System", () => {
 
       expect(expectError(result).message).toMatch(/dimensions/);
     });
+
+    it("rejects a spatial-scene with a missing root", () => {
+      const result = validateAsset({
+        id: FIXED_ID,
+        type: "spatial-scene",
+        createdAt: FIXED_TIMESTAMP,
+        mimeType: "application/json",
+        metadata: {},
+        dimensions: DIMENSIONS,
+      });
+
+      expect(expectError(result).message).toMatch(/root/);
+    });
+
+    it("rejects a spatial-scene with an invalid root node", () => {
+      const result = validateAsset({
+        id: FIXED_ID,
+        type: "spatial-scene",
+        createdAt: FIXED_TIMESTAMP,
+        mimeType: "application/json",
+        metadata: {},
+        dimensions: DIMENSIONS,
+        root: { id: "", name: "root", children: [] },
+      });
+
+      expect(expectError(result).message).toMatch(/root/);
+    });
+
+    it("validates a well-formed SpatialScene", () => {
+      const scene = createSpatialScene({
+        mimeType: "application/json",
+        dimensions: DIMENSIONS,
+        root: SIMPLE_SCENE_ROOT,
+      });
+      const result = validateAsset(scene);
+
+      expect(result.ok).toBe(true);
+      expect(result.ok && result.data.type).toBe("spatial-scene");
+    });
   });
 
   describe("serialization", () => {
@@ -313,6 +431,39 @@ describe("Asset System", () => {
     it("deserializeAsset rejects structurally invalid asset payloads", () => {
       const result = deserializeAsset(JSON.stringify({ id: FIXED_ID }));
       expect(result.ok).toBe(false);
+    });
+
+    it("round-trips a SpatialScene through JSON", () => {
+      const scene = createSpatialScene({
+        mimeType: "application/json",
+        dimensions: DIMENSIONS,
+        root: SIMPLE_SCENE_ROOT,
+        id: FIXED_ID,
+        createdAt: FIXED_TIMESTAMP,
+        metadata: { nodeCount: 3 },
+      });
+
+      const json = serializeAsset(scene);
+      const result = deserializeAsset(json);
+
+      expect(result.ok).toBe(true);
+      const restored = result.ok ? result.data : (undefined as unknown as Asset);
+      expect(restored.type).toBe("spatial-scene");
+      expect(restored.id).toBe(FIXED_ID);
+      expect(restored.metadata["nodeCount"]).toBe(3);
+    });
+
+    it("deserializeAsset restores a deeply-frozen SpatialScene", () => {
+      const scene = createSpatialScene({
+        mimeType: "application/json",
+        dimensions: DIMENSIONS,
+        root: SIMPLE_SCENE_ROOT,
+      });
+
+      const restoredResult = deserializeAsset(serializeAsset(scene));
+      expect(restoredResult.ok).toBe(true);
+      const restored = restoredResult.ok ? restoredResult.data : (undefined as unknown as Asset);
+      expect(Object.isFrozen(restored)).toBe(true);
     });
   });
 });

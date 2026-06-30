@@ -12,10 +12,10 @@
  * Discriminator for the different asset kinds.
  *
  * Future stages will extend this union with additional kinds such as
- * `"spatial-scene"`, `"runtime-scene"`, `"mesh"`, and `"texture"`. Those asset
- * models are intentionally NOT implemented yet.
+ * `"runtime-scene"`, `"mesh"`, and `"texture"`. Those asset models are
+ * intentionally NOT implemented yet.
  */
-export type AssetType = "image" | "processed-image" | "depth";
+export type AssetType = "image" | "processed-image" | "depth" | "spatial-scene";
 
 /**
  * Free-form metadata record. This is the extension point pipeline stages use to
@@ -86,12 +86,39 @@ export interface DepthAsset extends Asset {
   readonly dimensions: Dimensions;
 }
 
+/** A single node in a {@link SpatialScene} scene graph. */
+export interface SpatialSceneNode {
+  /** Stable node identifier (UUID). */
+  readonly id: string;
+  /** Human-readable label for the node. */
+  readonly name: string;
+  /** Child nodes, in render order. */
+  readonly children: readonly SpatialSceneNode[];
+}
+
+/**
+ * The canonical scene representation consumed by the viewer. Produced by a
+ * scene builder from an {@link ImageAsset} and a {@link DepthAsset} (whether
+ * real or mock).
+ *
+ * The scene carries a lightweight scene-graph root plus the source image
+ * dimensions. Lineage (source asset ids), processing time, and node counts are
+ * stored in `metadata` so the contract stays flat while remaining extensible.
+ */
+export interface SpatialScene extends Asset {
+  readonly type: "spatial-scene";
+  /** Dimensions of the source image the scene was built from. */
+  readonly dimensions: Dimensions;
+  /** Root scene-graph node. */
+  readonly root: SpatialSceneNode;
+}
+
 /**
  * Union of all currently implemented asset kinds. Downstream stages typing their
  * inputs/outputs should prefer this union (or a specific member) so the
  * compiler tracks the full set of supported assets.
  */
-export type AnyAsset = ImageAsset | ProcessedImageAsset | DepthAsset;
+export type AnyAsset = ImageAsset | ProcessedImageAsset | DepthAsset | SpatialScene;
 
 /**
  * Shared input options for asset factories. `id` and `createdAt` default to a
@@ -112,4 +139,10 @@ export interface AssetInitOptions {
 export interface DimensionedAssetInitOptions extends AssetInitOptions {
   /** Pixel dimensions. */
   readonly dimensions: Dimensions;
+}
+
+/** Input options for spatial-scene assets that carry a scene graph. */
+export interface SpatialSceneInitOptions extends DimensionedAssetInitOptions {
+  /** Root scene-graph node. */
+  readonly root: SpatialSceneNode;
 }

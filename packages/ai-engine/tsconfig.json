@@ -4,9 +4,10 @@
     "outDir": "./dist",
     "rootDir": "./src",
     "paths": {
-      "@atlas/ai-engine": ["./src/index.ts"]
+      "@atlas/ai-engine": ["./src/index.ts"],
+      "@atlas/shared": ["../shared/src/index.ts"]
     }
   },
   "include": ["src"],
-  "references": []
+  "references": [{ "path": "../shared" }]
 }
