@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { SandboxProvider } from "../stores/sandbox";
+import { AtlasServicesProvider } from "../stores/atlas";
 import { SandboxLayout } from "../components/sandbox/SandboxLayout";
 
 export const Route = createFileRoute("/sandbox")({
@@ -9,7 +10,9 @@ export const Route = createFileRoute("/sandbox")({
 function SandboxPage() {
   return (
     <SandboxProvider>
-      <SandboxLayout />
+      <AtlasServicesProvider>
+        <SandboxLayout />
+      </AtlasServicesProvider>
     </SandboxProvider>
   );
 }

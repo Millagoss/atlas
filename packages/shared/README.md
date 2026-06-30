@@ -46,6 +46,17 @@ mutating existing ones.
 - `serializeAsset(asset): string` — JSON string for persistence/transport.
 - `deserializeAsset(json): AtlasResult<AnyAsset>` — parse + validate + freeze.
 
+## Asset Registry
+
+A lightweight in-memory registry that acts as the runtime single source of
+truth for assets. No persistence; no reactivity. UIs mirror its state by
+dispatching store updates after mutating it.
+
+### Registry API
+
+- `AssetRegistry` — `register`, `get`, `has`, `remove`, `clear`, `size`, `all`,
+  `query(predicate)`, `getByType(type)`.
+
 ## Public API
 
 - `generateId`
@@ -59,6 +70,7 @@ mutating existing ones.
 - `createImageAsset`, `createProcessedImageAsset`, `createDepthAsset`
 - `validateAsset`
 - `serializeAsset`, `deserializeAsset`
+- `AssetRegistry`
 
 ## Dependencies
 

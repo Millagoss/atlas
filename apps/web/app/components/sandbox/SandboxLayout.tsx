@@ -1,9 +1,12 @@
 import { DevToolbar } from "./DevToolbar";
-import { PipelinePanel } from "./PipelinePanel";
 import { LogsPanel } from "./LogsPanel";
+import { ImageUploader } from "./ImageUploader";
+import { OriginalImagePanel } from "./OriginalImagePanel";
+import { RegistryPanel } from "./RegistryPanel";
+import { PipelineStatusPanel } from "./PipelineStatusPanel";
+import { PipelinePanel } from "./PipelinePanel";
 
-const PIPELINE_PANELS = [
-  "Original Image",
+const REMAINING_PANELS = [
   "Processed Image",
   "Depth Map",
   "SpatialScene",
@@ -19,11 +22,17 @@ export function SandboxLayout() {
             <h1 className="text-2xl font-bold tracking-tight">Developer Sandbox</h1>
             <p className="text-sm text-muted-foreground">Atlas Spatial Pipeline Inspector</p>
           </div>
-          <DevToolbar />
+          <div className="flex items-center gap-4">
+            <ImageUploader />
+            <DevToolbar />
+          </div>
         </div>
 
         <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
-          {PIPELINE_PANELS.map((title) => (
+          <OriginalImagePanel />
+          <RegistryPanel />
+          <PipelineStatusPanel />
+          {REMAINING_PANELS.map((title) => (
             <PipelinePanel key={title} title={title} />
           ))}
         </div>

@@ -47,6 +47,9 @@ importers:
       '@atlas/config':
         specifier: workspace:*
         version: link:../../packages/config
+      '@atlas/pipeline':
+        specifier: workspace:*
+        version: link:../../packages/pipeline
       '@atlas/shared':
         specifier: workspace:*
         version: link:../../packages/shared

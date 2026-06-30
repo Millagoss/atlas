@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "@atlas/config": "workspace:*",
+    "@atlas/pipeline": "workspace:*",
     "@atlas/shared": "workspace:*",
     "@atlas/ui": "workspace:*",
     "@tanstack/react-router": "^1.95.0",

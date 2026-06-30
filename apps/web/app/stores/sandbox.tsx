@@ -1,12 +1,42 @@
 import { createContext, useContext, useReducer, type Dispatch, type ReactNode } from "react";
+import type { AnyAsset } from "@atlas/shared";
+
+/** A single structured log entry displayed in the Sandbox Logs panel. */
+export interface LogEntry {
+  /** ISO 8601 timestamp. */
+  readonly timestamp: string;
+  /** Severity level. */
+  readonly level: "info" | "warn" | "error";
+  /** Human-readable message. */
+  readonly message: string;
+}
+
+/** Lifecycle status of the most recent pipeline execution. */
+export type PipelineStatus = "idle" | "running" | "completed" | "failed";
 
 export interface SandboxState {
+  /** Object URL for the original-image preview (rendered by the Sandbox). */
   originalImage: string | null;
   processedImage: string | null;
   depthMap: string | null;
   spatialScene: unknown;
   runtimeScene: unknown;
-  logs: string[];
+  /** Structured ingestion/pipeline lifecycle log entries, in order. */
+  logs: LogEntry[];
+  /** The canonical asset produced by the most recent successful ingestion. */
+  currentAsset: AnyAsset | null;
+  /** Asset id of {@link currentAsset}, surfaced separately for quick display. */
+  assetId: string | null;
+  /** Number of assets currently in the Asset Registry. */
+  registryCount: number;
+  /** Status of the most recent pipeline execution. */
+  pipelineStatus: PipelineStatus;
+  /** Error message from the most recent pipeline failure, if any. */
+  pipelineError: string | null;
+  /** Error message from the most recent ingestion failure, if any. */
+  ingestionError: string | null;
+  /** Whether an ingestion/pipeline run is currently in progress. */
+  isProcessing: boolean;
 }
 
 export type SandboxAction =
@@ -15,8 +45,15 @@ export type SandboxAction =
   | { type: "SET_DEPTH_MAP"; payload: string | null }
   | { type: "SET_SPATIAL_SCENE"; payload: unknown }
   | { type: "SET_RUNTIME_SCENE"; payload: unknown }
-  | { type: "APPEND_LOG"; payload: string }
+  | { type: "APPEND_LOG"; payload: LogEntry }
   | { type: "CLEAR_LOGS" }
+  | { type: "SET_CURRENT_ASSET"; payload: AnyAsset | null }
+  | { type: "SET_ASSET_ID"; payload: string | null }
+  | { type: "SET_REGISTRY_COUNT"; payload: number }
+  | { type: "SET_PIPELINE_STATUS"; payload: PipelineStatus }
+  | { type: "SET_PIPELINE_ERROR"; payload: string | null }
+  | { type: "SET_INGESTION_ERROR"; payload: string | null }
+  | { type: "SET_PROCESSING"; payload: boolean }
   | { type: "RESET" };
 
 export const initialState: SandboxState = {
@@ -26,6 +63,13 @@ export const initialState: SandboxState = {
   spatialScene: null,
   runtimeScene: null,
   logs: [],
+  currentAsset: null,
+  assetId: null,
+  registryCount: 0,
+  pipelineStatus: "idle",
+  pipelineError: null,
+  ingestionError: null,
+  isProcessing: false,
 };
 
 export function sandboxReducer(state: SandboxState, action: SandboxAction): SandboxState {
@@ -44,6 +88,20 @@ export function sandboxReducer(state: SandboxState, action: SandboxAction): Sand
       return { ...state, logs: [...state.logs, action.payload] };
     case "CLEAR_LOGS":
       return { ...state, logs: [] };
+    case "SET_CURRENT_ASSET":
+      return { ...state, currentAsset: action.payload };
+    case "SET_ASSET_ID":
+      return { ...state, assetId: action.payload };
+    case "SET_REGISTRY_COUNT":
+      return { ...state, registryCount: action.payload };
+    case "SET_PIPELINE_STATUS":
+      return { ...state, pipelineStatus: action.payload };
+    case "SET_PIPELINE_ERROR":
+      return { ...state, pipelineError: action.payload };
+    case "SET_INGESTION_ERROR":
+      return { ...state, ingestionError: action.payload };
+    case "SET_PROCESSING":
+      return { ...state, isProcessing: action.payload };
     case "RESET":
       return initialState;
     default:
