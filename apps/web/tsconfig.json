@@ -12,7 +12,8 @@
       "@atlas/ui": ["../../packages/ui/src/index.ts"],
       "@atlas/pipeline": ["../../packages/pipeline/src/index.ts"],
       "@atlas/ai-engine": ["../../packages/ai-engine/src/index.ts"],
-      "@atlas/scene-engine": ["../../packages/scene-engine/src/index.ts"]
+      "@atlas/scene-engine": ["../../packages/scene-engine/src/index.ts"],
+      "@atlas/viewer-engine": ["../../packages/viewer-engine/src/index.ts"]
     }
   },
   "include": ["app/**/*.ts", "app/**/*.tsx", "*.ts"],
@@ -23,6 +24,7 @@
     { "path": "../../packages/ui" },
     { "path": "../../packages/pipeline" },
     { "path": "../../packages/ai-engine" },
-    { "path": "../../packages/scene-engine" }
+    { "path": "../../packages/scene-engine" },
+    { "path": "../../packages/viewer-engine" }
   ]
 }

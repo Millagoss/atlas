@@ -1,3 +1,4 @@
+import { useSandbox } from "../../stores/sandbox";
 import { DevToolbar } from "./DevToolbar";
 import { LogsPanel } from "./LogsPanel";
 import { ImageUploader } from "./ImageUploader";
@@ -6,10 +7,14 @@ import { RegistryPanel } from "./RegistryPanel";
 import { PipelineStatusPanel } from "./PipelineStatusPanel";
 import { SpatialScenePanel } from "./SpatialScenePanel";
 import { PipelinePanel } from "./PipelinePanel";
+import { ViewerHost } from "./ViewerHost";
+import { PipelineInspector } from "./PipelineInspector";
 
-const REMAINING_PANELS = ["Processed Image", "Depth Map", "Runtime Viewer"] as const;
+const REMAINING_PANELS = ["Processed Image", "Depth Map"] as const;
 
 export function SandboxLayout() {
+  const { state } = useSandbox();
+
   return (
     <div className="min-h-screen bg-background p-6">
       <div className="mx-auto max-w-7xl space-y-6">
@@ -29,9 +34,11 @@ export function SandboxLayout() {
           <RegistryPanel />
           <PipelineStatusPanel />
           <SpatialScenePanel />
+          <PipelineInspector />
           {REMAINING_PANELS.map((title) => (
             <PipelinePanel key={title} title={title} />
           ))}
+          <ViewerHost spatialScene={state.spatialScene} />
         </div>
 
         <LogsPanel />

@@ -14,6 +14,16 @@ export interface LogEntry {
 /** Lifecycle status of the most recent pipeline execution. */
 export type PipelineStatus = "idle" | "running" | "completed" | "failed";
 
+/** Status of an individual pipeline stage. */
+export type StageStatus = "pending" | "running" | "completed" | "failed";
+
+/** Information about a single pipeline stage tracked by the inspector. */
+export interface PipelineStageInfo {
+  readonly name: string;
+  readonly status: StageStatus;
+  readonly durationMs: number | null;
+}
+
 export interface SandboxState {
   /** Object URL for the original-image preview (rendered by the Sandbox). */
   originalImage: string | null;
@@ -40,6 +50,8 @@ export interface SandboxState {
   ingestionError: string | null;
   /** Whether an ingestion/pipeline run is currently in progress. */
   isProcessing: boolean;
+  /** Pipeline stage statuses for the inspector. */
+  pipelineStages: PipelineStageInfo[];
 }
 
 export type SandboxAction =
@@ -58,6 +70,11 @@ export type SandboxAction =
   | { type: "SET_PIPELINE_ERROR"; payload: string | null }
   | { type: "SET_INGESTION_ERROR"; payload: string | null }
   | { type: "SET_PROCESSING"; payload: boolean }
+  | { type: "SET_PIPELINE_STAGES"; payload: PipelineStageInfo[] }
+  | {
+      type: "UPDATE_PIPELINE_STAGE";
+      payload: { name: string; status: StageStatus; durationMs?: number };
+    }
   | { type: "RESET" };
 
 export const initialState: SandboxState = {
@@ -75,6 +92,7 @@ export const initialState: SandboxState = {
   pipelineError: null,
   ingestionError: null,
   isProcessing: false,
+  pipelineStages: [],
 };
 
 export function sandboxReducer(state: SandboxState, action: SandboxAction): SandboxState {
@@ -109,6 +127,21 @@ export function sandboxReducer(state: SandboxState, action: SandboxAction): Sand
       return { ...state, ingestionError: action.payload };
     case "SET_PROCESSING":
       return { ...state, isProcessing: action.payload };
+    case "SET_PIPELINE_STAGES":
+      return { ...state, pipelineStages: action.payload };
+    case "UPDATE_PIPELINE_STAGE":
+      return {
+        ...state,
+        pipelineStages: state.pipelineStages.map((s) =>
+          s.name === action.payload.name
+            ? {
+                ...s,
+                status: action.payload.status,
+                durationMs: action.payload.durationMs ?? s.durationMs,
+              }
+            : s,
+        ),
+      };
     case "RESET":
       return initialState;
     default:

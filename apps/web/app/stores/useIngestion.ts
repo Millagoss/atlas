@@ -1,9 +1,15 @@
-import { useCallback, useEffect } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import type { PipelineEvent } from "@atlas/pipeline";
 
 import { ingestImage, type IngestionLogLevel } from "../ingestion/ingest";
 import { useAtlasServices } from "./atlas";
-import { useSandbox } from "./sandbox";
+import { useSandbox, type PipelineStageInfo } from "./sandbox";
+
+const INGESTION_STAGES = ["ingest-image", "generate-depth", "build-spatial-scene"] as const;
+
+function initialStages(): PipelineStageInfo[] {
+  return INGESTION_STAGES.map((name) => ({ name, status: "pending", durationMs: null }));
+}
 
 /** Safely pull an error message out of a pipeline event's `unknown` payload. */
 function extractEventErrorMessage(data: unknown): string | undefined {
@@ -26,6 +32,7 @@ export function useIngestion() {
   const services = useAtlasServices();
   const { state, dispatch } = useSandbox();
   const { registry, pipeline, extractor } = services;
+  const stageStartTimes = useRef<Map<string, number>>(new Map());
 
   // Mirror pipeline lifecycle events (per-stage logs + status) into the sandbox.
   // `dispatch` from useReducer is stable, so this effect wires listeners once.
@@ -39,6 +46,8 @@ export function useIngestion() {
 
     const onStarted = () => {
       dispatch({ type: "SET_PIPELINE_STATUS", payload: "running" });
+      dispatch({ type: "SET_PIPELINE_STAGES", payload: initialStages() });
+      stageStartTimes.current = new Map();
       appendLog("info", "Pipeline Started");
     };
     const onCompleted = () => {
@@ -46,15 +55,32 @@ export function useIngestion() {
       dispatch({ type: "SET_PIPELINE_ERROR", payload: null });
     };
     const onStageStarted = (event: PipelineEvent) => {
-      appendLog("info", `Stage started: ${event.stage ?? "unknown"}`);
+      const stageName = event.stage ?? "unknown";
+      stageStartTimes.current.set(stageName, event.timestamp);
+      dispatch({ type: "UPDATE_PIPELINE_STAGE", payload: { name: stageName, status: "running" } });
+      appendLog("info", `Stage started: ${stageName}`);
     };
     const onStageCompleted = (event: PipelineEvent) => {
-      appendLog("info", `Stage completed: ${event.stage ?? "unknown"}`);
+      const stageName = event.stage ?? "unknown";
+      const startTime = stageStartTimes.current.get(stageName);
+      const durationMs = startTime != null ? event.timestamp - startTime : undefined;
+      dispatch({
+        type: "UPDATE_PIPELINE_STAGE",
+        payload: { name: stageName, status: "completed", durationMs },
+      });
+      appendLog("info", `Stage completed: ${stageName}`);
     };
     const onStageFailed = (event: PipelineEvent) => {
+      const stageName = event.stage ?? "unknown";
+      const startTime = stageStartTimes.current.get(stageName);
+      const durationMs = startTime != null ? event.timestamp - startTime : undefined;
+      dispatch({
+        type: "UPDATE_PIPELINE_STAGE",
+        payload: { name: stageName, status: "failed", durationMs },
+      });
       const detail = extractEventErrorMessage(event.data);
       const detailSuffix = detail ? ` — ${detail}` : "";
-      appendLog("error", `Stage failed: ${event.stage ?? "unknown"}${detailSuffix}`);
+      appendLog("error", `Stage failed: ${stageName}${detailSuffix}`);
     };
 
     pipeline.on("pipeline:started", onStarted);
