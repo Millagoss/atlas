@@ -14,6 +14,9 @@ export default defineConfig({
     viteReact(),
   ],
   optimizeDeps: {
-    exclude: ["onnxruntime-web"],
+    exclude: ["onnxruntime-web", "onnxruntime-web/webgpu"],
+  },
+  ssr: {
+    external: ["onnxruntime-web", "onnxruntime-web/webgpu"],
   },
 });

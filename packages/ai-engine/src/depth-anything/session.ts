@@ -51,18 +51,14 @@ interface OrtModule {
     create(url: string, options?: OrtSessionOptions): Promise<OrtInferenceSession>;
   };
   Tensor: new (type: string, data: Float32Array, dims: readonly number[]) => OrtTensor;
-  env: {
-    wasm: { wasmPaths: string };
-  };
 }
 
 let cachedSession: Promise<DepthOnnxSession> | null = null;
 let cachedModelKey: string | null = null;
 
 async function loadOrt(): Promise<OrtModule> {
-  const mod = (await import("onnxruntime-web")) as OrtModule;
-  mod.env.wasm.wasmPaths = "https://cdn.jsdelivr.net/npm/onnxruntime-web@1.21.0/dist/";
-  return mod;
+  // Browser build with WebGPU + WASM backends; bundled wasm must match this package version.
+  return (await import("onnxruntime-web/webgpu")) as OrtModule;
 }
 
 function modelCacheKey(model: DepthModelConfig): string {
