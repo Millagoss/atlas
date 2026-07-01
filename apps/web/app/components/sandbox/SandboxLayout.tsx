@@ -8,6 +8,7 @@ import { PipelineStatusPanel } from "./PipelineStatusPanel";
 import { SpatialScenePanel } from "./SpatialScenePanel";
 import { PipelinePanel } from "./PipelinePanel";
 import { ViewerHost } from "./ViewerHost";
+import { ViewerStatusPanel } from "./ViewerStatusPanel";
 import { PipelineInspector } from "./PipelineInspector";
 
 const REMAINING_PANELS = ["Processed Image", "Depth Map"] as const;
@@ -39,6 +40,7 @@ export function SandboxLayout() {
             <PipelinePanel key={title} title={title} />
           ))}
           <ViewerHost spatialScene={state.spatialScene} />
+          <ViewerStatusPanel />
         </div>
 
         <LogsPanel />

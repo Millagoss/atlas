@@ -13,6 +13,12 @@ import {
   type Object3D,
 } from "three";
 import type { SpatialScene, SpatialSceneNode } from "@atlas/shared";
+import {
+  CameraControls,
+  type CameraState,
+  type NavigationMode,
+  type NavigationCallback,
+} from "./camera-controls.js";
 
 export type ViewerLifecycleEvent =
   "viewer:initialized" | "viewer:scene-loaded" | "viewer:scene-updated" | "viewer:disposed";
@@ -28,6 +34,7 @@ export class Viewer {
   private sceneGroup: Group | null = null;
   private animationId: number | null = null;
   private disposed = false;
+  private controls: CameraControls | null = null;
 
   constructor(private readonly config: ViewerConfig) {}
 
@@ -69,6 +76,9 @@ export class Viewer {
     this.sceneGroup = new Group();
     this.scene.add(this.sceneGroup);
 
+    this.controls = new CameraControls(this.camera, this.canvas);
+    this.controls.enable();
+
     this.startRenderLoop();
     console.log("[Atlas Viewer] Viewer Initialized");
   }
@@ -81,6 +91,7 @@ export class Viewer {
 
     const isUpdate = this.sceneGroup.children.length > 0;
     if (isUpdate) {
+      this.frameScene();
       console.log("[Atlas Viewer] Scene Loaded");
     }
   }
@@ -90,6 +101,7 @@ export class Viewer {
 
     this.clearSceneGroup();
     this.buildSceneGraph(spatialScene, this.sceneGroup);
+    this.frameScene();
     console.log("[Atlas Viewer] Scene Updated");
   }
 
@@ -98,6 +110,11 @@ export class Viewer {
 
     this.stopRenderLoop();
     this.clearSceneGroup();
+
+    if (this.controls) {
+      this.controls.dispose();
+      this.controls = null;
+    }
 
     if (this.renderer) {
       this.renderer.dispose();
@@ -114,6 +131,34 @@ export class Viewer {
 
   isDisposed(): boolean {
     return this.disposed;
+  }
+
+  getCameraState(): CameraState | null {
+    if (!this.controls) return null;
+    return this.controls.cameraState;
+  }
+
+  getNavigationMode(): NavigationMode | null {
+    if (!this.controls) return null;
+    return this.controls.mode;
+  }
+
+  addNavigationListener(cb: NavigationCallback): void {
+    this.controls?.addListener(cb);
+  }
+
+  removeNavigationListener(cb: NavigationCallback): void {
+    this.controls?.removeListener(cb);
+  }
+
+  resetCamera(): void {
+    this.controls?.resetCamera();
+  }
+
+  private frameScene(): void {
+    if (this.controls && this.sceneGroup) {
+      this.controls.resetForScene(this.sceneGroup);
+    }
   }
 
   private clearSceneGroup(): void {

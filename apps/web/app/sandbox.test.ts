@@ -20,6 +20,8 @@ describe("sandbox state store", () => {
     expect(initialState.pipelineError).toBeNull();
     expect(initialState.ingestionError).toBeNull();
     expect(initialState.isProcessing).toBe(false);
+    expect(initialState.cameraState).toBeNull();
+    expect(initialState.navigationMode).toBeNull();
   });
 
   it("SET_ORIGINAL_IMAGE updates originalImage", () => {
@@ -81,6 +83,38 @@ describe("sandbox state store", () => {
     };
     const next = sandboxReducer(dirty, { type: "RESET" });
     expect(next).toEqual(initialState);
+  });
+
+  it("SET_CAMERA_STATE updates camera state", () => {
+    const state = {
+      position: { x: 1.5, y: 2.5, z: 3.5 },
+      target: { x: 0, y: 0, z: 0 },
+    };
+    const next = sandboxReducer(initialState, { type: "SET_CAMERA_STATE", payload: state });
+    expect(next.cameraState).toEqual(state);
+  });
+
+  it("SET_CAMERA_STATE accepts null", () => {
+    const withState = sandboxReducer(initialState, {
+      type: "SET_CAMERA_STATE",
+      payload: { position: { x: 1, y: 1, z: 1 }, target: { x: 0, y: 0, z: 0 } },
+    });
+    const next = sandboxReducer(withState, { type: "SET_CAMERA_STATE", payload: null });
+    expect(next.cameraState).toBeNull();
+  });
+
+  it("SET_NAVIGATION_MODE updates navigation mode", () => {
+    const next = sandboxReducer(initialState, { type: "SET_NAVIGATION_MODE", payload: "orbiting" });
+    expect(next.navigationMode).toBe("orbiting");
+  });
+
+  it("SET_NAVIGATION_MODE accepts null", () => {
+    const withMode = sandboxReducer(initialState, {
+      type: "SET_NAVIGATION_MODE",
+      payload: "orbiting",
+    });
+    const next = sandboxReducer(withMode, { type: "SET_NAVIGATION_MODE", payload: null });
+    expect(next.navigationMode).toBeNull();
   });
 
   it("unknown action returns state unchanged", () => {

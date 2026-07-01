@@ -1,5 +1,6 @@
 import { createContext, useContext, useReducer, type Dispatch, type ReactNode } from "react";
 import type { AnyAsset, DepthAsset, SpatialScene } from "@atlas/shared";
+import type { CameraState, NavigationMode } from "@atlas/viewer-engine";
 
 /** A single structured log entry displayed in the Sandbox Logs panel. */
 export interface LogEntry {
@@ -52,6 +53,10 @@ export interface SandboxState {
   isProcessing: boolean;
   /** Pipeline stage statuses for the inspector. */
   pipelineStages: PipelineStageInfo[];
+  /** Current camera state from the viewer engine. */
+  cameraState: CameraState | null;
+  /** Current navigation interaction mode. */
+  navigationMode: NavigationMode | null;
 }
 
 export type SandboxAction =
@@ -75,6 +80,8 @@ export type SandboxAction =
       type: "UPDATE_PIPELINE_STAGE";
       payload: { name: string; status: StageStatus; durationMs?: number };
     }
+  | { type: "SET_CAMERA_STATE"; payload: CameraState | null }
+  | { type: "SET_NAVIGATION_MODE"; payload: NavigationMode | null }
   | { type: "RESET" };
 
 export const initialState: SandboxState = {
@@ -93,6 +100,8 @@ export const initialState: SandboxState = {
   ingestionError: null,
   isProcessing: false,
   pipelineStages: [],
+  cameraState: null,
+  navigationMode: null,
 };
 
 export function sandboxReducer(state: SandboxState, action: SandboxAction): SandboxState {
@@ -142,6 +151,10 @@ export function sandboxReducer(state: SandboxState, action: SandboxAction): Sand
             : s,
         ),
       };
+    case "SET_CAMERA_STATE":
+      return { ...state, cameraState: action.payload };
+    case "SET_NAVIGATION_MODE":
+      return { ...state, navigationMode: action.payload };
     case "RESET":
       return initialState;
     default:
