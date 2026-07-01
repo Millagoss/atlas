@@ -6,12 +6,13 @@ import { OriginalImagePanel } from "./OriginalImagePanel";
 import { RegistryPanel } from "./RegistryPanel";
 import { PipelineStatusPanel } from "./PipelineStatusPanel";
 import { SpatialScenePanel } from "./SpatialScenePanel";
+import { DepthAnalysisPanel } from "./DepthAnalysisPanel";
 import { PipelinePanel } from "./PipelinePanel";
 import { ViewerHost } from "./ViewerHost";
 import { ViewerStatusPanel } from "./ViewerStatusPanel";
 import { PipelineInspector } from "./PipelineInspector";
 
-const REMAINING_PANELS = ["Processed Image", "Depth Map"] as const;
+const REMAINING_PANELS = ["Processed Image"] as const;
 
 export function SandboxLayout() {
   const { state } = useSandbox();
@@ -36,6 +37,7 @@ export function SandboxLayout() {
           <PipelineStatusPanel />
           <SpatialScenePanel />
           <PipelineInspector />
+          <DepthAnalysisPanel />
           {REMAINING_PANELS.map((title) => (
             <PipelinePanel key={title} title={title} />
           ))}

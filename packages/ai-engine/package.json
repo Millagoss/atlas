@@ -15,7 +15,8 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@atlas/shared": "workspace:*"
+    "@atlas/shared": "workspace:*",
+    "onnxruntime-web": "^1.21.0"
   },
   "devDependencies": {
     "vitest": "^2.1.8"

@@ -13,4 +13,7 @@ export default defineConfig({
     }),
     viteReact(),
   ],
+  optimizeDeps: {
+    exclude: ["onnxruntime-web"],
+  },
 });

@@ -92,6 +92,7 @@ export async function ingestImage(file: File, deps: IngestionDeps): Promise<Inge
     metadata: {
       filename: file.name,
       fileSize: file.size,
+      previewUrl,
     },
   });
   logger.log("info", `ImageAsset Created: ${asset.id}`);

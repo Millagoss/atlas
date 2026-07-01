@@ -8,79 +8,79 @@
 // You should NOT make any changes in this file as it will be overwritten.
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
-import { Route as rootRouteImport } from "./routes/__root";
-import { Route as SandboxRouteImport } from "./routes/sandbox";
-import { Route as IndexRouteImport } from "./routes/index";
+import { Route as rootRouteImport } from './routes/__root'
+import { Route as SandboxRouteImport } from './routes/sandbox'
+import { Route as IndexRouteImport } from './routes/index'
 
 const SandboxRoute = SandboxRouteImport.update({
-  id: "/sandbox",
-  path: "/sandbox",
+  id: '/sandbox',
+  path: '/sandbox',
   getParentRoute: () => rootRouteImport,
-} as any);
+} as any)
 const IndexRoute = IndexRouteImport.update({
-  id: "/",
-  path: "/",
+  id: '/',
+  path: '/',
   getParentRoute: () => rootRouteImport,
-} as any);
+} as any)
 
 export interface FileRoutesByFullPath {
-  "/": typeof IndexRoute;
-  "/sandbox": typeof SandboxRoute;
+  '/': typeof IndexRoute
+  '/sandbox': typeof SandboxRoute
 }
 export interface FileRoutesByTo {
-  "/": typeof IndexRoute;
-  "/sandbox": typeof SandboxRoute;
+  '/': typeof IndexRoute
+  '/sandbox': typeof SandboxRoute
 }
 export interface FileRoutesById {
-  __root__: typeof rootRouteImport;
-  "/": typeof IndexRoute;
-  "/sandbox": typeof SandboxRoute;
+  __root__: typeof rootRouteImport
+  '/': typeof IndexRoute
+  '/sandbox': typeof SandboxRoute
 }
 export interface FileRouteTypes {
-  fileRoutesByFullPath: FileRoutesByFullPath;
-  fullPaths: "/" | "/sandbox";
-  fileRoutesByTo: FileRoutesByTo;
-  to: "/" | "/sandbox";
-  id: "__root__" | "/" | "/sandbox";
-  fileRoutesById: FileRoutesById;
+  fileRoutesByFullPath: FileRoutesByFullPath
+  fullPaths: '/' | '/sandbox'
+  fileRoutesByTo: FileRoutesByTo
+  to: '/' | '/sandbox'
+  id: '__root__' | '/' | '/sandbox'
+  fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute;
-  SandboxRoute: typeof SandboxRoute;
+  IndexRoute: typeof IndexRoute
+  SandboxRoute: typeof SandboxRoute
 }
 
-declare module "@tanstack/react-router" {
+declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    "/sandbox": {
-      id: "/sandbox";
-      path: "/sandbox";
-      fullPath: "/sandbox";
-      preLoaderRoute: typeof SandboxRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
-    "/": {
-      id: "/";
-      path: "/";
-      fullPath: "/";
-      preLoaderRoute: typeof IndexRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
+    '/sandbox': {
+      id: '/sandbox'
+      path: '/sandbox'
+      fullPath: '/sandbox'
+      preLoaderRoute: typeof SandboxRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   SandboxRoute: SandboxRoute,
-};
+}
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
-  ._addFileTypes<FileRouteTypes>();
+  ._addFileTypes<FileRouteTypes>()
 
-import type { getRouter } from "./router.tsx";
-import type { createStart } from "@tanstack/react-start";
-declare module "@tanstack/react-start" {
+import type { getRouter } from './router.tsx'
+import type { createStart } from '@tanstack/react-start'
+declare module '@tanstack/react-start' {
   interface Register {
-    ssr: true;
-    router: Awaited<ReturnType<typeof getRouter>>;
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
   }
 }

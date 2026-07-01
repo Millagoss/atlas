@@ -120,6 +120,11 @@ export function useIngestion() {
         dispatch({ type: "SET_CURRENT_ASSET", payload: asset });
         dispatch({ type: "SET_ASSET_ID", payload: asset.id });
         dispatch({ type: "SET_DEPTH_ASSET", payload: depth });
+        const preview =
+          typeof depth.metadata["depthPreviewUrl"] === "string"
+            ? depth.metadata["depthPreviewUrl"]
+            : null;
+        dispatch({ type: "SET_DEPTH_MAP", payload: preview });
         dispatch({ type: "SET_SPATIAL_SCENE", payload: scene });
         dispatch({ type: "SET_REGISTRY_COUNT", payload: registry.size() });
       } else {

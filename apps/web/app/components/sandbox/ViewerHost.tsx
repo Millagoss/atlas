@@ -58,12 +58,13 @@ export function ViewerHost({ spatialScene }: ViewerHostProps) {
   return (
     <div className="rounded-lg border bg-card p-4">
       <h2 className="mb-3 text-sm font-semibold text-foreground">Runtime Viewer</h2>
-      <div className="flex min-h-[300px] items-center justify-center rounded-md border border-dashed bg-muted/50 p-0 overflow-hidden">
-        {spatialScene ? (
-          <canvas ref={canvasRef} className="w-full h-full min-h-[300px]" />
-        ) : (
-          <p className="text-sm text-muted-foreground">Upload an image to render the scene</p>
-        )}
+      <div className="relative flex min-h-[300px] items-center justify-center rounded-md border border-dashed bg-muted/50 p-0 overflow-hidden">
+        <canvas ref={canvasRef} className="w-full h-full min-h-[300px]" />
+        {!spatialScene ? (
+          <p className="pointer-events-none absolute inset-0 flex items-center justify-center text-sm text-muted-foreground">
+            Upload an image to render the scene
+          </p>
+        ) : null}
       </div>
     </div>
   );

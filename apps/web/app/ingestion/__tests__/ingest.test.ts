@@ -115,6 +115,7 @@ describe("ingestImage", () => {
       expect(result.data.previewUrl).toBe("blob:preview");
       expect(asset.metadata["filename"]).toBe("photo.png");
       expect(asset.metadata["fileSize"]).toBe(1024);
+      expect(asset.metadata["previewUrl"]).toBe("blob:preview");
       expect(result.data.depth.type).toBe("depth");
       expect(result.data.scene.type).toBe("spatial-scene");
     }
